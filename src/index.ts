@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 
 import authRouter from './routes/auth.routes.js';
 import clientRouter from './routes/client.routes.js';
+import oauthRouter from './routes/oauth.routes.js';
 import { connectDB } from './config/db.connect.js';
 
 const app = express();
@@ -18,8 +19,9 @@ app.use(cors({ origin: env.CLIENT_ORIGINS, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use('/api/auth', authRouter);
+app.use('/api/oauth', authRouter);
 app.use('/api/clients', clientRouter);
+app.use('/oauth', oauthRouter);
 
 // catches anything thrown outside the controllers (e.g. bad JSON body)
 // express only treats this as an error handler when it has 4 params, so _next must stay

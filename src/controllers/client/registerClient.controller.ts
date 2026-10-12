@@ -11,7 +11,7 @@ interface RegisterClientRequestBody {
 
 // authMiddleware runs first: only a logged in user can register an app
 export async function registerClient(
-  req: Request<Record<string, string>, ApiResponse, RegisterClientRequestBody>,
+  req: Request<unknown, null, RegisterClientRequestBody>,
   res: Response<ApiResponse>,
 ) {
   try {
@@ -22,15 +22,16 @@ export async function registerClient(
       });
     }
 
-    const { clientName, redirectUris } = (req.body ?? {}) as Partial<RegisterClientRequestBody>;
+    const { clientName, redirectUris } = req.body;
 
-    if (typeof clientName !== 'string' || !clientName.trim()) {
+    if (!clientName || !redirectUris) {
       return res.status(400).json({
         success: false,
-        message: 'clientName is required',
+        message: 'Required field are missing',
       });
     }
 
+    // checks every uri is a valid https url (or http while developing)
     const uris = parseRedirectUris(redirectUris);
 
     if (!uris) {

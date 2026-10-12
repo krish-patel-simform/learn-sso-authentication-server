@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Create account</title>
+    <link rel="stylesheet" href="/auth-page.css" />
+  </head>
+  <body>
+    <main class="card">
+      <h1>Create account</h1>
+      <p class="subtitle">Register to continue</p>
+
+      <form data-action="register">
+        <label>
+          First name
+          <input type="text" name="first_name" autocomplete="given-name" required />
+        </label>
+
+        <label>
+          Last name
+          <input type="text" name="last_name" autocomplete="family-name" required />
+        </label>
+
+        <label>
+          Email
+          <input type="email" name="email" autocomplete="email" required />
+        </label>
+
+        <label>
+          Password
+          <input type="password" name="password" autocomplete="new-password" required />
+          <small>At least 8 characters with an uppercase, a lowercase, a number and one of @$!%*?&</small>
+        </label>
+
+        <button type="submit">Create account</button>
+        <p id="message" class="message" role="alert"></p>
+      </form>
+
+      <p class="switch">Already have an account? <a data-switch href="/login">Login</a></p>
+    </main>
+
+    <script src="/auth-page.js"></script>
+  </body>
+</html>

@@ -14,8 +14,6 @@ export async function authorize(req: Request, res: Response<ApiResponse>) {
     const client = res.locals.client as ClientDocument;
     const { redirect_uri, state, code_challenge, client_id } = req.query as Record<string, string>;
 
-    // is the user logged in to the auth server? (same check as authMiddleware)
-
     if (
       typeof client_id !== 'string' ||
       typeof redirect_uri !== 'string' ||

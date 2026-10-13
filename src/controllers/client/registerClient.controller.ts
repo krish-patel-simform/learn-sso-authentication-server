@@ -15,13 +15,6 @@ export async function registerClient(
   res: Response<ApiResponse>,
 ) {
   try {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Unauthorized',
-      });
-    }
-
     const { clientName, redirectUris } = req.body;
 
     if (!clientName || !redirectUris) {
@@ -48,7 +41,6 @@ export async function registerClient(
       clientId,
       clientSecretHash,
       redirectUris: uris,
-      createdBy: req.user.id,
     });
 
     return res.status(201).json({

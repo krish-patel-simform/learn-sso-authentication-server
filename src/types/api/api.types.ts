@@ -3,3 +3,8 @@ export interface ApiResponse {
   message: string;
   [key: string]: unknown;
 }
+
+export interface WithAuthRequest {
+  accessToken?: string;
+  refreshToken?: string;
+}

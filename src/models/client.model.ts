@@ -1,11 +1,11 @@
-import { model, Schema, type HydratedDocument, type Types } from 'mongoose';
+import { model, Schema, type HydratedDocument } from 'mongoose';
 
 export interface IClient {
   name: string;
   clientId: string;
   clientSecretHash: string;
   redirectUris: string[];
-  createdBy: Types.ObjectId;
+  // createdBy: string;
 }
 
 const clientSchema = new Schema<IClient>(
@@ -33,11 +33,10 @@ const clientSchema = new Schema<IClient>(
       required: true,
       validate: [(uris: string[]) => uris.length > 0, 'At least one redirect uri is required'],
     },
-    createdBy: {
-      type: Schema.Types.ObjectId,
-      ref: 'users',
-      required: true,
-    },
+    // createdBy: {
+    //   type: Schema.Types.String,
+    //   required: true,
+    // },
   },
   { timestamps: true },
 );

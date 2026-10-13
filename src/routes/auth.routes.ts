@@ -8,6 +8,6 @@ authRouter.post('/register', authController.register);
 authRouter.post('/login', authController.login);
 authRouter.post('/refresh', authController.refreshTokens);
 authRouter.post('/logout', authMiddleware, authController.logout);
-authRouter.get('/me', authMiddleware, authController.me);
+// authRouter.get('/me', authMiddleware, authController.me);
 
 export default authRouter;

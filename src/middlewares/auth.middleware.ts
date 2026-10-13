@@ -1,11 +1,15 @@
 import type { NextFunction, Request, Response } from 'express';
-import type { ApiResponse } from '../types/api/api.types.js';
+import type { ApiResponse, WithAuthRequest } from '../types/api/api.types.js';
 import { getAuthUserFromAccessToken } from '../services/sessions/verifySession.service.js';
-import { SSO_ACCESS_TOKEN_NAME } from '../constants/auth.constant.js';
 
-export async function authMiddleware(req: Request, res: Response<ApiResponse>, next: NextFunction) {
+export async function authMiddleware(
+  req: Request<unknown, null, WithAuthRequest>,
+  res: Response<ApiResponse>,
+  next: NextFunction,
+) {
   try {
-    const user = await getAuthUserFromAccessToken(req.cookies?.[SSO_ACCESS_TOKEN_NAME]);
+    // used an accessToken form the request that is not comign form the broswe
+    const user = await getAuthUserFromAccessToken(req.body.accessToken);
 
     if (!user) {
       return res.status(401).json({

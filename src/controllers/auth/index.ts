@@ -5,3 +5,4 @@ export { logout } from './logout.controller.js';
 export { me } from './me.controller.js';
 export { authorize } from './authorize.controller.js';
 export { token } from './token.controller.js';
+export { oauthLogout } from './oauthlogout.controller.js';

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as authController from '../controllers/auth/index.js';
 import { validateClient } from '../middlewares/client.middleware.js';
 import { authMiddleware } from '../middlewares/auth.middleware.js';
+import { oauthMiddleware } from '../middlewares/oauth.middleware.js';
 
 const oauthRouter = Router();
 
@@ -12,5 +13,7 @@ oauthRouter.get('/authorize', validateClient, authController.authorize);
 oauthRouter.post('/token', authController.token);
 // authMiddleware reads accessToken from the body and sets req.user, which me needs
 oauthRouter.post('/user-info', authMiddleware, authController.me);
+
+oauthRouter.get('/logout', oauthMiddleware, authController.oauthLogout);
 
 export default oauthRouter;

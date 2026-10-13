@@ -9,7 +9,8 @@ export async function authMiddleware(
 ) {
   try {
     // used an accessToken form the request that is not comign form the broswe
-    const user = await getAuthUserFromAccessToken(req.body.accessToken);
+    // req.body is undefined when no json body was sent, so use ?. : a missing token is a 401, not a crash
+    const user = await getAuthUserFromAccessToken(req.body?.accessToken);
 
     if (!user) {
       return res.status(401).json({

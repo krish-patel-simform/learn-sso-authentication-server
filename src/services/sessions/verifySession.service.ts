@@ -34,7 +34,6 @@ export async function checkAccessToken(accessToken: unknown): Promise<AccessToke
   return { valid: true, user: { id: decoded.userId, sessionId: decoded.sessionId } };
 }
 
-// the "is this user logged in to the auth server?" check, shared by authMiddleware (api, json 401)
 // and /oauth/authorize (browser, redirect to the login page).
 // returns null for ANY failure, use checkAccessToken when you need to know why
 export async function getAuthUserFromAccessToken(accessToken: unknown): Promise<AuthUser | null> {

@@ -50,6 +50,21 @@ export function isRedirectUriAllowed(client: { redirectUris: string[] }, redirec
   return typeof redirectUri === 'string' && client.redirectUris.includes(redirectUri);
 }
 
+// for logout: the user may only be sent back to a SITE of this client, so the origin (scheme + host + port)
+// of the url must be the origin of one of the registered redirect uris. any path on that site is fine
+export function isRedirectOriginAllowed(client: { redirectUris: string[] }, redirectTo: unknown) {
+  if (typeof redirectTo !== 'string') return false;
+
+  try {
+    const { origin } = new URL(redirectTo);
+
+    // 'null' is the origin of non http(s) urls like javascript: or data:
+    return origin !== 'null' && client.redirectUris.some((uri) => new URL(uri).origin === origin);
+  } catch {
+    return false;
+  }
+}
+
 // step 3 (only on /token, server to server): the app proves it is the real app with its secret
 export async function verifyClientSecret(clientId: string, clientSecret: unknown) {
   if (typeof clientSecret !== 'string' || !clientSecret) return false;

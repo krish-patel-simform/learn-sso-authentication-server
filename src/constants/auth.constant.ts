@@ -6,3 +6,6 @@ export const REFRESH_COOKIE_PATH = '/api/auth';
 
 // the code is only a short-lived ticket, the app must swap it for tokens quickly
 export const AUTH_CODE_MAX_AGE_MS = 60 * 1000;
+
+export const SSO_ACCESS_TOKEN_NAME = 'sso_access_token';
+export const SSO_REFRESH_TOKEN_NAME = 'sso_refresh_token';

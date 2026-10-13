@@ -10,6 +10,11 @@ authRouter.post('/login', authController.login);
 authRouter.post('/refresh', authController.refreshTokens);
 authRouter.post('/logout', authMiddleware, authController.logout);
 authRouter.get('/me', authMiddleware, authController.me);
+
+// this is main entry point for the SSO
 authRouter.get('/authorize', validateClient, authController.authorize);
+
+// this is used to verify teh token and code if every thing is correct then send the accessToken and refreshToken
+authRouter.post('/token', authController.token);
 
 export default authRouter;

@@ -4,6 +4,8 @@ import {
   ACCESS_TOKEN_MAX_AGE_MS,
   REFRESH_COOKIE_PATH,
   REFRESH_TOKEN_MAX_AGE_MS,
+  SSO_ACCESS_TOKEN_NAME,
+  SSO_REFRESH_TOKEN_NAME,
 } from '../constants/auth.constant.js';
 
 const baseOptions: CookieOptions = {
@@ -19,17 +21,17 @@ export function setAuthCookies(
   res: Response,
   tokens: { accessToken: string; refreshToken: string },
 ) {
-  res.cookie('accessToken', tokens.accessToken, {
+  res.cookie(SSO_ACCESS_TOKEN_NAME, tokens.accessToken, {
     ...accessOptions,
     maxAge: ACCESS_TOKEN_MAX_AGE_MS,
   });
-  res.cookie('refreshToken', tokens.refreshToken, {
+  res.cookie(SSO_REFRESH_TOKEN_NAME, tokens.refreshToken, {
     ...refreshOptions,
     maxAge: REFRESH_TOKEN_MAX_AGE_MS,
   });
 }
 
 export function clearAuthCookies(res: Response) {
-  res.clearCookie('accessToken', accessOptions);
-  res.clearCookie('refreshToken', refreshOptions);
+  res.clearCookie(SSO_ACCESS_TOKEN_NAME, accessOptions);
+  res.clearCookie(SSO_REFRESH_TOKEN_NAME, refreshOptions);
 }

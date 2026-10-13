@@ -23,5 +23,15 @@ export default tseslint.config(
                 ...globals.node
             }
         }
+    },
+
+    // the login / register pages run in the browser, not in node
+    {
+        files: ["public/**/*.js"],
+        languageOptions: {
+            globals: {
+                ...globals.browser
+            }
+        }
     }
 );

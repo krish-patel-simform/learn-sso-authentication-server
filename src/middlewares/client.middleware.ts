@@ -2,23 +2,10 @@ import type { NextFunction, Request, Response } from 'express';
 import type { ApiResponse } from '../types/api/api.types.js';
 import { findClient, isRedirectUriAllowed } from '../services/client.service.js';
 
-// query values are NOT guaranteed to be strings (?a=1&a=2 gives an array, ?a[x]=1 gives an object)
-// so they are typed as unknown and checked with typeof below
-interface ValidateClientQueryParams {
-  client_id?: unknown;
-  redirect_uri?: unknown;
-  response_type?: unknown;
-  state?: unknown;
-  code_challenge?: unknown;
-  code_challenge_method?: unknown;
-}
-
-export async function validateClient(
-  req: Request<unknown, null, null, ValidateClientQueryParams>,
-  res: Response<ApiResponse>,
-  next: NextFunction,
-) {
+export async function validateClient(req: Request, res: Response<ApiResponse>, next: NextFunction) {
   try {
+    // query values are NOT guaranteed to be strings (?a=1&a=2 gives an array, ?a[x]=1 gives an object)
+    // so every one is checked with typeof below
     const { client_id, redirect_uri, response_type, state, code_challenge, code_challenge_method } =
       req.query;
 

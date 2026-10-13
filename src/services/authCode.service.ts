@@ -25,3 +25,15 @@ export async function createAuthCode(input: CreateAuthCodeInput) {
 
   return code;
 }
+
+// find the code AND mark it used in ONE query, so two requests with the same code can never both win.
+// the code is hashed with hashToken (sha256) exactly like in createAuthCode: the same input gives the
+// same hash, a bcrypt hash would be different every time and never match.
+// the expiry is checked here too, because mongo's TTL index can delete an expired code up to ~1 min late.
+// returns the code as it was BEFORE the update (null if missing, expired or already used)
+export function consumeAuthCode(code: string) {
+  return AuthCodeModel.findOneAndUpdate(
+    { hashedCode: hashToken(code), isUsed: false, expiresAt: { $gt: new Date() } },
+    { $set: { isUsed: true } },
+  );
+}

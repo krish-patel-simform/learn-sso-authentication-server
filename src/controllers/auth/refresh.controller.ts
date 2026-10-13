@@ -1,18 +1,12 @@
 import type { Request, Response } from 'express';
 import type { ApiResponse } from '../../types/api/api.types.js';
-import {
-  createAccessToken,
-  createRefreshToken,
-  verifyRefreshToken,
-} from '../../services/jwt.service.js';
-import { SessionModel } from '../../models/session.model.js';
-import { REFRESH_TOKEN_MAX_AGE_MS } from '../../constants/auth.constant.js';
-import { hashToken } from '../../utils/token.utils.js';
+import { refreshAccessToken } from '../../services/refresh.service.js';
+import { SSO_REFRESH_TOKEN_NAME } from '../../constants/auth.constant.js';
 import { clearAuthCookies, setAuthCookies } from '../../utils/cookie.utils.js';
 
 export async function refreshTokens(req: Request, res: Response<ApiResponse>) {
   try {
-    const refreshToken = req.cookies?.refreshToken;
+    const refreshToken = req.cookies?.[SSO_REFRESH_TOKEN_NAME];
 
     if (typeof refreshToken !== 'string') {
       return res.status(401).json({
@@ -21,25 +15,10 @@ export async function refreshTokens(req: Request, res: Response<ApiResponse>) {
       });
     }
 
-    const decoded = verifyRefreshToken(refreshToken);
+    // the service checks the token + session and gives a new access token, here we only deal with http
+    const newTokens = await refreshAccessToken(refreshToken);
 
-    if (!decoded) {
-      clearAuthCookies(res);
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid or expired refresh token',
-      });
-    }
-
-    // same token -> same sha256 hash, so we can find its session directly
-    const session = await SessionModel.findOne({
-      hashedRefreshToken: hashToken(refreshToken),
-      isRevoked: false,
-      expireAt: { $gt: new Date() },
-    });
-
-    // never create a session here: no session means the user was logged out (or token was already rotated)
-    if (!session) {
+    if (!newTokens) {
       clearAuthCookies(res);
       return res.status(401).json({
         success: false,
@@ -47,18 +26,10 @@ export async function refreshTokens(req: Request, res: Response<ApiResponse>) {
       });
     }
 
-    // rotation: every refresh gives a new refresh token and the old one stops working
-    const newRefreshToken = createRefreshToken({ userID: decoded.userID });
-    session.hashedRefreshToken = hashToken(newRefreshToken);
-    session.expireAt = new Date(Date.now() + REFRESH_TOKEN_MAX_AGE_MS);
-    await session.save();
-
-    const accessToken = createAccessToken({
-      userId: decoded.userID,
-      sessionId: session._id.toString(),
+    setAuthCookies(res, {
+      accessToken: newTokens.acessToken,
+      refreshToken: newTokens.refreshToken,
     });
-
-    setAuthCookies(res, { accessToken, refreshToken: newRefreshToken });
 
     return res.status(200).json({
       success: true,

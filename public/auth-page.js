@@ -1,7 +1,8 @@
 // shared by login.html and register.html
+// must be the same as AUTH_BASE_PATH and OAUTH_BASE_PATH in src/constants/auth.constant.ts
 // if the api is mounted somewhere else, change these two lines only
-const API_BASE = '/api/oauth';
-const AUTHORIZE_PATH = '/api/oauth/authorize';
+const API_BASE = '/api/auth'; // login and register
+const AUTHORIZE_PATH = '/api/oauth/authorize'; // where returnTo has to point
 
 // returnTo is the original /authorize url the user was sent here from.
 // only accept the authorize path of THIS server, otherwise this page becomes an open redirect

@@ -3,6 +3,7 @@ import express from 'express';
 import type { ErrorRequestHandler } from 'express';
 import { env } from './config/env.js';
 import { Server as HttpServer } from 'node:http';
+import path from 'node:path';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
@@ -10,6 +11,7 @@ import authRouter from './routes/auth.routes.js';
 import clientRouter from './routes/client.routes.js';
 import oauthRouter from './routes/oauth.routes.js';
 import { connectDB } from './config/db.connect.js';
+import { AUTH_BASE_PATH, OAUTH_BASE_PATH } from './constants/auth.constant.js';
 
 const app = express();
 
@@ -19,9 +21,15 @@ app.use(cors({ origin: env.CLIENT_ORIGINS, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use('/api/oauth', authRouter);
+// serves the login / register pages (and their js + css) from the public folder:
+// /login -> public/login.html, /register -> public/register.html.
+// it must be the same server (same origin) so the cookies from the login api are saved for this domain.
+// ../public works from both src/ (dev) and dist/ (build)
+app.use(express.static(path.join(import.meta.dirname, '../public'), { extensions: ['html'] }));
+
+app.use(AUTH_BASE_PATH, authRouter);
+app.use(OAUTH_BASE_PATH, oauthRouter);
 app.use('/api/clients', clientRouter);
-app.use('/oauth', oauthRouter);
 
 // catches anything thrown outside the controllers (e.g. bad JSON body)
 // express only treats this as an error handler when it has 4 params, so _next must stay

@@ -6,6 +6,7 @@ import { hashToken } from '../utils/token.utils.js';
 interface CreateAuthCodeInput {
   clientId: string;
   userId: string;
+  ssoSessionId: string;
   redirectUri: string;
   codeChallenge: string;
 }
@@ -18,6 +19,7 @@ export async function createAuthCode(input: CreateAuthCodeInput) {
     hashedCode: hashToken(code),
     clientId: input.clientId,
     userId: input.userId,
+    ssoSessionId: input.ssoSessionId,
     redirectUri: input.redirectUri,
     codeChallenge: input.codeChallenge,
     expiresAt: new Date(Date.now() + AUTH_CODE_MAX_AGE_MS),

@@ -3,6 +3,7 @@ import type { ApiResponse } from '../../types/api/api.types.js';
 import { verifyClientSecret } from '../../services/client.service.js';
 import { consumeAuthCode } from '../../services/authCode.service.js';
 import { createSession } from '../../services/sessions/createSession.service.js';
+import { SessionModel } from '../../models/session.model.js';
 import { verifyCodeChallenge } from '../../utils/pkce.utils.js';
 import { ACCESS_TOKEN_MAX_AGE_MS } from '../../constants/auth.constant.js';
 
@@ -71,9 +72,29 @@ export async function token(
       });
     }
 
-    // every check passed: create the app's session and tokens for the user who logged in
-    //
-    const tokens = await createSession(authCode.userId.toString());
+    // the SSO login that gave the code must still be alive (the user may have logged out in the meantime).
+    // parentSessionId: null makes sure it is a real SSO login, not another app's session
+    const ssoSession = await SessionModel.findOne({
+      _id: authCode.ssoSessionId,
+      userId: authCode.userId,
+      parentSessionId: null,
+      isRevoked: false,
+      expireAt: { $gt: new Date() },
+    }).select('expireAt');
+
+    if (!ssoSession) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired authorization code',
+      });
+    }
+
+    // every check passed: create the app's session as a CHILD of the SSO login, so logging out
+    // of the SSO removes it too. it also expires together with the SSO login
+    const tokens = await createSession(authCode.userId.toString(), {
+      parentSessionId: ssoSession._id.toString(),
+      expireAt: ssoSession.expireAt,
+    });
 
     // tokens must never be cached
     res.setHeader('Cache-Control', 'no-store');

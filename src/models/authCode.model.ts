@@ -4,6 +4,7 @@ export interface IAuthCode {
   hashedCode: string;
   clientId: string;
   userId: Types.ObjectId;
+  ssoSessionId: Types.ObjectId;
   redirectUri: string;
   codeChallenge: string;
   expiresAt: Date;
@@ -16,6 +17,8 @@ const authCodeSchema = new Schema<IAuthCode>(
     hashedCode: { type: Schema.Types.String, required: true, unique: true },
     clientId: { type: Schema.Types.String, required: true },
     userId: { type: Schema.Types.ObjectId, ref: 'users', required: true },
+    // the SSO login (browser session) that approved this code, /token makes the app session its child
+    ssoSessionId: { type: Schema.Types.ObjectId, ref: 'sessions', required: true },
     // /token must receive the exact same redirect uri that was used here
     redirectUri: { type: Schema.Types.String, required: true },
     // PKCE: /token checks the app's code_verifier against this

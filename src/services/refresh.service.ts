@@ -30,9 +30,10 @@ export async function refreshAccessToken(refreshToken: string) {
     userId: refreshDecoded.userID,
   });
 
-  // userId is returned too, the caller (/authorize) needs to know who the session belongs to
+  // userId and sessionId are returned too, the caller (/authorize) needs to know whose session this is
   return {
     userId: refreshDecoded.userID,
+    sessionId: sessionExist._id.toString(),
     acessToken: newAccessToken,
     refreshToken: refreshToken,
   };

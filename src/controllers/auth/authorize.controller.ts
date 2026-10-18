@@ -34,9 +34,12 @@ export async function authorize(req: Request, res: Response<ApiResponse>) {
 
     // filled in below, either from the access token or from a refresh
     let userId: string;
+    // the SSO login (browser session) giving this code, the app session from /token is linked to it
+    let ssoSessionId: string;
 
     if (check.valid) {
       userId = check.user.id;
+      ssoSessionId = check.user.sessionId;
     } else {
       // access token is not usable (missing / invalid / expired / session gone): try the refresh token.
       // 'session_invalid' means logout or revoke, the refresh token belongs to that same session so it would fail too
@@ -59,11 +62,13 @@ export async function authorize(req: Request, res: Response<ApiResponse>) {
       });
 
       userId = newTokens.userId;
+      ssoSessionId = newTokens.sessionId;
     }
 
     const code = await createAuthCode({
       clientId: client.clientId,
       userId,
+      ssoSessionId,
       redirectUri: redirect_uri,
       codeChallenge: code_challenge,
     });
